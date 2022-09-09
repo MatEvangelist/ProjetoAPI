@@ -48,7 +48,7 @@ public class GoRestSteps extends ApiRequest {
         jsonValues.put("name", faker.name().fullName());
         jsonValues.put("gender", "Female");
         jsonValues.put("status", "Inactive");
-        return  jsonValues;
+        return  jsonValues ;
     }
 
     @Então("o usuario deve ser criado corretamente")
