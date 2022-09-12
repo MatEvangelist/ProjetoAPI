@@ -5,6 +5,7 @@ import api.ApiRequest;
 
 import com.github.javafaker.Faker;
 import io.cucumber.java.pt.Dado;
+import io.cucumber.java.pt.E;
 import io.cucumber.java.pt.Então;
 import io.cucumber.java.pt.Quando;
 import io.cucumber.messages.internal.com.google.gson.Gson;
@@ -33,6 +34,7 @@ public class GoRestSteps extends ApiRequest {
     Faker faker = new Faker();
     Map<String, String> jsonValues = new HashMap<>();
     UsersLombok userRequest, userResponse;
+    String userId;
 
     @Dado("que possuo um token valido")
     public void que_possuo_um_token_valido() {
@@ -170,7 +172,7 @@ public class GoRestSteps extends ApiRequest {
     public void envio_um_request_de_cadastro_de_usuario_com_dados_validos() {
         super.url = properties.getProp("url_gorest");
         super.headers = apiHeaders.goRestHeaders(super.token);
-        userRequest = UsersLombok.builder().build();
+        userRequest = UsersLombok.builder().gender("male").status("inactive").build();
         super.body = userRequest.getJson();
 
         super.POST();
@@ -191,11 +193,68 @@ public class GoRestSteps extends ApiRequest {
     @Então("o usuario deve ser criado corretamente")
     public void o_usuario_deve_ser_criado_corretamente() {
         userResponse = response.jsonPath().getObject("data", UsersLombok.class);
-        assertEquals(userRequest, userResponse);
+        assertEquals("Erro na comparação do objeto", userRequest, userResponse);
     }
 
     @Então("o status code do request deve ser {int}")
     public void o_status_code_do_request_deve_ser(int statusCode) {
         assertEquals("Status code diferente do esperado!", statusCode, super.response.statusCode());
+    }
+
+    @E("exista um usuario cadastrado na API")
+    public void existaUmUsuarioCadastradoNaAPI() {
+        envio_um_request_de_cadastro_de_usuario_com_dados_validos();
+    }
+
+    @Quando("busco esse usuario")
+    public void buscoEsseUsuario() {
+        super.url = properties.getProp("url_gorest") + "/" + response.jsonPath().get("data.id");
+        super.headers = apiHeaders.goRestHeaders(super.token);
+        super.body = new JSONObject(); //método pra resetar o body e não bagunçar o relatório na hora do get
+        super.GET();
+    }
+
+    @Então("os dados do usuario devem ser retornados")
+    public void osDadosDoUsuarioDevemSerRetornados() {
+        userResponse = response.jsonPath().getObject("data", UsersLombok.class);
+        assertEquals("Erro na comparação do objeto", userRequest, userResponse);
+    }
+
+    @Quando("altero os dados desse usuario")
+    public void alteroOsDadosDesseUsuario() {
+        super.url = properties.getProp("url_gorest") + "/" + response.jsonPath().get("data.id");
+        super.headers = apiHeaders.goRestHeaders(super.token);
+        userRequest.setStatus("active");
+        super.body = new JSONObject(new Gson().toJson(userRequest));
+        super.PUT();
+    }
+
+    @Então("os dados do usuario devem ser alterados com sucesso")
+    public void osDadosDoUsuarioDevemSerAlteradosComSucesso() {
+        userResponse = response.jsonPath().getObject("data", UsersLombok.class);
+        assertEquals("Erro na comparação do objeto", userRequest, userResponse);
+    }
+
+
+    @Quando("altero um ou mais dados desse usuario")
+    public void alteroUmOuMaisDadosDesseUsuario() {
+        super.url = properties.getProp("url_gorest") + "/" + response.jsonPath().get("data.id");
+        super.headers = apiHeaders.goRestHeaders(super.token);
+        userRequest.setGender("female");
+        super.body = new JSONObject("{\"gender\":\"female\"}");
+        super.PATCH();
+    }
+
+    @Quando("deleto esse usuario")
+    public void deletoEsseUsuario() {
+        super.url = properties.getProp("url_gorest") + "/" + response.jsonPath().get("data.id");
+        super.headers = apiHeaders.goRestHeaders(super.token);
+        super.body = new JSONObject();
+        super.DELETE();
+    }
+
+    @Então("o usuario e deletado com sucesso")
+    public void oUsuarioEDeletadoComSucesso() {
+        assertEquals("", response.asString());
     }
 }

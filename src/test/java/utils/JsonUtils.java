@@ -1,10 +1,8 @@
 package utils;
 
-import io.cucumber.messages.internal.com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.XML;
 
 import java.io.IOException;
 import java.nio.file.Files;

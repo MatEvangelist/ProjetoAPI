@@ -1,10 +1,7 @@
 package user;
 
 import com.github.javafaker.Faker;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Arrays;
 import java.util.Collections;
