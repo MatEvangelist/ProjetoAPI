@@ -10,12 +10,12 @@ import java.util.concurrent.TimeUnit;
 
 public class ApiUtils extends LogUtils {
 
-    protected static Response response;
-    protected static JSONObject body;
-    protected static String url;
-    protected static Map<String, String> headers = new HashMap<>();
-    protected static Map<String, String> params = new HashMap<>();
-    protected static String token;
+    protected Response response;
+    protected JSONObject body;
+    protected String url;
+    protected Map<String, String> headers = new HashMap<>();
+    protected Map<String, String> params = new HashMap<>();
+    protected String token;
 
     public void log(String verbo) {
         super.logInfo("****** Dados Enviados no Request ******");
